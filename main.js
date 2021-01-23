@@ -105,6 +105,7 @@ function parse_companies() {
 		var info = c.querySelector('.information > .info');
 		const prod = unpack_money(info.querySelector('.info > .primary > .animated-number').innerText);
 		company['prod'] = prod;
+
 		const duration = parse_time(info.querySelector('small').innerText.replace(/^\/ /g, ''));
 		company['duration'] = duration;
 
@@ -112,6 +113,7 @@ function parse_companies() {
 		if (action) {
 			const upgrade_speed = action.querySelector('button[tooltip="Upgrade Speed"]');
 			if (upgrade_speed) {
+				company['speed_button'] = action.querySelector('button[tooltip="Upgrade Speed"]')//aa
 				company['upgrade_speed'] = {
 					cost: unpack_money(action.querySelector('.animated-number').innerText),
 					new_duration: duration + parse_time(upgrade_speed.innerText)
@@ -120,6 +122,7 @@ function parse_companies() {
 
 			action = action.nextElementSibling;
 			if (action) {
+				company['prod_button'] = action.querySelector('button[tooltip="Upgrade Production"]')//aa
 				const upgrade_prod = action.querySelector('button[tooltip="Upgrade Production"]');
 				if (upgrade_prod) {
 					company['upgrade_prod'] = {
@@ -150,6 +153,7 @@ function evaluate_upgrades(balance, income, companies) {
 			var prod_delta = (cmp.prod / up1.new_duration - prod_per_sec);
 			var shortage = (up1.cost > balance) ? (up1.cost - balance) : 0;
 			upgrades.push({
+				button: cmp.speed_button,
 				cmp: cmp.name,
 				name: 'Duration (Left side)',
 				cost: up1.cost,
@@ -163,6 +167,7 @@ function evaluate_upgrades(balance, income, companies) {
 			prod_delta = up2.new_prod / cmp.duration - prod_per_sec;
 			var shortage = (up2.cost > balance) ? (up2.cost - balance) : 0;
 			upgrades.push({
+				button: cmp.prod_button,
 				cmp: cmp.name,
 				name: 'Production (Right side)',
 				cost: up2.cost,
@@ -183,11 +188,13 @@ function upgrades_sorter(a, b) {
 	return (b.prod_delta - a.prod_delta);
 }
 
-function print_upgrade(prefix, up) {
+function print_upgrade(prefix, up) { //Print then click upgrade
 	const prod_delta = pack_money(up.prod_delta);
 	const cost = pack_money(up.cost);
 	const eta = format_eta(up.eta);
 	console.log("%s [prod_delta: %s, cost: %s] %s => %s %s", prefix, prod_delta, cost, up.cmp, up.name, eta);
+	console.log("clicking upgrade");
+	up.button.click(); 
 }
 
 function format_eta(eta) {
@@ -251,7 +258,7 @@ function main() {
 	}
 
 	upgrades.sort(upgrades_sorter);
-	print_top_upgrades(upgrades, 4);
+	print_top_upgrades(upgrades, 1);
 
 	const locked = locked_companies(balance, income);
 	if (locked && locked.length > 0) {
@@ -268,4 +275,6 @@ function main() {
 
 var _G = {};
 
+var intervalId = window.setInterval(function(){
 main();
+}, 5000);
