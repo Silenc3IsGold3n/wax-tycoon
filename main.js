@@ -193,8 +193,13 @@ function print_upgrade(prefix, up) { //Print then click upgrade
 	const cost = pack_money(up.cost);
 	const eta = format_eta(up.eta);
 	console.log("%s [prod_delta: %s, cost: %s] %s => %s %s", prefix, prod_delta, cost, up.cmp, up.name, eta);
+	if (!up.button.disabled){
 	console.log("clicking upgrade");
 	up.button.click(); 
+	}
+	else{
+	console.log("still waiting to click");
+	}
 }
 
 function format_eta(eta) {
@@ -252,12 +257,14 @@ function main() {
 	}
 
 	const upgrades = evaluate_upgrades(balance, income, companies);
+	//evaluate_upgrades(unpack_money($$('.balance .animated-number')[0].innerText), income, parse_companies())
 	if (upgrades.length == 0) {
 		console.warn('No upgrade available.');
 		return;
 	}
 
 	upgrades.sort(upgrades_sorter);
+	//evaluate_upgrades(unpack_money($$('.balance .animated-number')[0].innerText), income, parse_companies()).sort(upgrades_sorter)
 	print_top_upgrades(upgrades, 1);
 
 	const locked = locked_companies(balance, income);
