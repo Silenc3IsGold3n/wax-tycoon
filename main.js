@@ -207,7 +207,7 @@ function format_eta(eta) {
 	const now = new Date();
 	const done = new Date(now.getTime() + eta * 1000);
 	//return (' [Ready @ ' + done.getMonth() + '/' + done.getDate() + '-' + done.getHours() + ':' + done.getMinutes() + ' (' + Math.ceil(eta) + ' sec)]');
-	return (' [Ready @ ' + done.toString() + ']');
+	return (done);
 }
 
 function print_top_upgrades(ups, max) {
@@ -275,9 +275,13 @@ function main() {
 		locked.sort(locked_sorter);
 		console.log('Next company to unlock:', locked[0]);
 	}
-	
-	print_top_upgrades(upgrades, 1);
-
+	var now = new Date();
+	if(((locked[0].eta.getTime() - now.getTime()) / 1000) < 600){ //if there's less than 10 minutes to next unlock
+		//wait instead of upgrading
+	}
+	else{
+		print_top_upgrades(upgrades, 1);
+	}
 
 
 	// add variable to global for user inspection
