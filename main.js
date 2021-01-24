@@ -222,8 +222,12 @@ function print_top_upgrades(ups, max) {
 function locked_companies(balance, income) {
 	var locked = [];
 	$$('.box-list > .company').forEach(function(cmp, i) {
-		if (cmp.querySelector('.disabled')) {
-			const cost = unpack_money(cmp.querySelector('.disabled > .action-big > .animated-number').innerText);
+		if (cmp.querySelector('.disabled')) {//if the current building is locked
+			const cost = unpack_money(cmp.querySelector('.disabled > .action-big > .animated-number').innerText);//cost to unlock it
+			if(!cmp.querySelector('.disabled > .action-big > button.launch').disabled){
+				console.log('Locked building being unlocked!');
+				cmp.querySelector('.disabled > .action-big > button.launch').click();
+			}
 			eta = (cost > balance) ? ((cost - balance) / income) : 0;
 			locked.push({
 				name: cmp.querySelector('.information > .name').innerText,
@@ -265,13 +269,16 @@ function main() {
 
 	upgrades.sort(upgrades_sorter);
 	//evaluate_upgrades(unpack_money($$('.balance .animated-number')[0].innerText), income, parse_companies()).sort(upgrades_sorter)
-	print_top_upgrades(upgrades, 1);
-
+	
 	const locked = locked_companies(balance, income);
 	if (locked && locked.length > 0) {
 		locked.sort(locked_sorter);
 		console.log('Next company to unlock:', locked[0]);
 	}
+	
+	print_top_upgrades(upgrades, 1);
+
+
 
 	// add variable to global for user inspection
 	_G.balance = balance;
